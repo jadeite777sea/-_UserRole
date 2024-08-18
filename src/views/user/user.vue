@@ -210,6 +210,17 @@ export default {
       userEditDialogVisible: false,
       importDialogVisible: false,
       allRoles: [],
+      userCreateRules: {
+        userName: [{ required: true, trigger: 'blur', validator: this.userNameValidator }],
+        password: [{ required: true, trigger: 'change', validator: this.passwordValidator }],
+        roleIds: [{ required: true, trigger: 'change', validator: this.roleValidator }]
+      },
+      userUpdateRules: {
+        userName: [{ required: true, trigger: 'blur', validator: this.userNameValidator }],
+        password: [{ trigger: 'change', validator: this.passwordValidator }],
+        roleIds: [{ required: true, trigger: 'change', validator: this.roleValidator }]
+      },
+
       userData: [{
         id: 1,
         username: 'john_doe',
@@ -245,7 +256,9 @@ export default {
         bio: 'Marketing specialist with a passion for data analysis.',
         phone: '555-123-4567',
         role: 'Editor'
-      }]
+      }],
+
+      currentEditRow: null
 
     }
   },
@@ -254,6 +267,35 @@ export default {
   },
 
   methods: {
+    userNameValidator(rule, value, callback) {
+      if (!value) {
+        callback(new Error('请输入用户名'))
+      } else if (this.userEditForm.id && value === this.currentEditRow.userName) {
+        callback()
+      } else {
+        checkUserName(value).then(res => {
+          callback(res.data.data ? new Error('用户名已存在') : undefined)
+        })
+      }
+    },
+
+    passwordValidator(rule, value, callback) {
+      if (!value && this.userEditForm.id) {
+        callback()
+      } else if (!value || value.length < 6) {
+        callback(new Error('密码长度不能小于6位'))
+      } else {
+        callback()
+      }
+    },
+
+    roleValidator(rule, value, callback) {
+      if (!value || value.length === 0) {
+        callback(new Error('角色不能为空'))
+      } else {
+        callback()
+      }
+    },
     avatarUploadData,
     getUserList() {
       // 获取用户列表的方法，通常会调用API来获取用户数据

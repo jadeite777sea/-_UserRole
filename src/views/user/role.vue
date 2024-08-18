@@ -1,5 +1,6 @@
 <template>
   <div class="dashboard-container">
+
     <el-form label="搜索内容" label-width="80px" inline="true" size="small">
       <el-form-item label="搜索内容">
         <el-input

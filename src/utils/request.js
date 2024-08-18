@@ -1,83 +1,81 @@
+import router from '@/router'
 import axios from 'axios'
-import { MessageBox, Message } from 'element-ui'
-import store from '@/store'
-import { getToken } from '@/utils/auth'
+import { getToken, setToken, removeToken } from './auth'
+import ElementUI from 'element-ui'
 
-// create an axios instance
 const service = axios.create({
-  baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
-  // withCredentials: true, // send cookies when cross-domain requests
-  timeout: 5000 // request timeout
+  timeout: 10000 // 请求超时设置为 10 秒
 })
 
-// request interceptor
+// axios拦截器，默认增加请求头token
 service.interceptors.request.use(
   config => {
-    // do something before request is sent
-
-    if (store.getters.token) {
-      // let each request carry token
-      // ['X-Token'] is a custom headers key
-      // please modify it according to the actual situation
-      config.headers['X-Token'] = getToken()
+    const token = getToken()
+    if (token) {
+      config.headers.Authorization = token // 如果存在 token，则在请求头中添加 Authorization
     }
     return config
   },
-  error => {
-    // do something with request error
-    console.log(error) // for debug
-    return Promise.reject(error)
+  err => {
+    return Promise.reject(err) // 请求错误时，返回一个拒绝的 Promise
   }
 )
 
-// response interceptor
+// 防止同时间弹出多个错误提示
+let hasErrorMessage = false
+
+const showErrorMessage = (response) => {
+  if (!hasErrorMessage && response.data.message && response.data.message !== '用户未登录，请先登录') {
+    ElementUI.Message.error(response.data.message) // 使用 ElementUI 弹出错误提示
+    hasErrorMessage = true
+    setTimeout(() => {
+      hasErrorMessage = false // 在 1 秒后允许再次弹出错误提示
+    }, 1000)
+  }
+}
+
+// 更新token
+const updateToken = (response) => {
+  const oldToken = getToken() // 获取当前存储的旧 token
+  const newToken = response.headers.authorization // 从响应头中获取新的 token
+  if (newToken && oldToken !== newToken) {
+    setToken(newToken) // 如果新 token 存在且与旧 token 不相同，则更新 token
+  }
+  // 检查是否需要移除token
+  if (response.headers['remove-token']) {
+    removeToken() // 如果响应头中包含 'remove-token'，则移除当前存储的 token
+  }
+}
+
+// axios响应拦截器
+
 service.interceptors.response.use(
-  /**
-   * If you want to get http information such as headers or status
-   * Please return  response => response
-  */
-
-  /**
-   * Determine the request status by custom code
-   * Here is just an example
-   * You can also judge the status by HTTP Status Code
-   */
-  response => {
-    const res = response.data
-
-    // if the custom code is not 20000, it is judged as an error.
-    if (res.code !== 20000) {
-      Message({
-        message: res.message || 'Error',
-        type: 'error',
-        duration: 5 * 1000
-      })
-
-      // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
-      if (res.code === 50008 || res.code === 50012 || res.code === 50014) {
-        // to re-login
-        MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
-          confirmButtonText: 'Re-Login',
-          cancelButtonText: 'Cancel',
-          type: 'warning'
-        }).then(() => {
-          store.dispatch('user/resetToken').then(() => {
-            location.reload()
-          })
-        })
-      }
-      return Promise.reject(new Error(res.message || 'Error'))
+  function(res) {
+    updateToken(res)
+    if (res.data && res.data.status && (res.data.status < 200 || res.data.status >= 300)) {
+      showErrorMessage(res)
+      return Promise.reject(res)
     } else {
       return res
     }
   },
-  error => {
-    console.log('err' + error) // for debug
-    Message({
-      message: error.message,
-      type: 'error',
-      duration: 5 * 1000
-    })
+  function(error) {
+    if (![500, 400, 404].includes(error.response.status)) {
+      updateToken(error.response)
+      showErrorMessage(error.response)
+    }
+    // 处理 401 Unauthorized 错误
+    if (error.response.status === 401) {
+      // UserUtils.resetUserStore() // 注释的部分可能是重置用户状态
+      setTimeout(() => {
+        const path = router.app.$route.path
+        if (path === '/login') {
+          location.reload()
+        } else {
+          router.push({ path: '/login' })
+        }
+      }, 1000)
+    }
     return Promise.reject(error)
   }
 )

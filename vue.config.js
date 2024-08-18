@@ -15,6 +15,31 @@ const name = defaultSettings.title || 'vue Element Admin' // page title
 // port = 9527 npm run dev OR npm run dev --port = 9527
 const port = process.env.port || process.env.npm_config_port || 9527 // dev port
 
+const gatewayUrl = 'http://localhost:8002/api'
+const devUrlMap = {
+  'user-api': 'http://localhost:8080/v1'
+}
+
+const prodUrlMap = {
+  'user-api': gatewayUrl + '/user/v1'
+}
+
+const devMode = process.env.NODE_ENV !== 'production'
+// const debugMode = true;
+const urlMap = devMode ? devUrlMap : prodUrlMap
+
+const proxyTable = {}
+for (const key in urlMap) {
+  proxyTable['/' + key] = {
+    target: urlMap[key],
+    changeOrigin: true,
+    secure: false,
+    pathRewrite: {
+      ['^/' + key]: '/'
+    }
+  }
+}
+
 // All configuration item explanations can be find in https://cli.vuejs.org/config/
 module.exports = {
   /**
@@ -36,7 +61,8 @@ module.exports = {
       warnings: false,
       errors: true
     },
-    before: require('./mock/mock-server.js')
+    proxy: proxyTable
+    // before: require('./mock/mock-server.js')
   },
   configureWebpack: {
     // provide the app's title in webpack's name field, so that

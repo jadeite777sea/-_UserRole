@@ -16,7 +16,7 @@
       </el-form-item>
     </el-form>
 
-    <el-table :data="tableData.list" @sort-change="handleSortChange">
+    <el-table :data="tableData.allData" @sort-change="handleSortChange">
       <el-table-column type="index" width="60" />
       <el-table-column prop="name" label="角色名称" sortable="custom" />
       <el-table-column prop="description" label="角色描述" sortable="custom" />
@@ -64,7 +64,7 @@
 
         <el-form-item>
           <el-button @click="roleEditDialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="addOrUpdateUser">确 定</el-button>
+          <el-button type="primary" @click="addOrUpdateRole">确 定</el-button>
         </el-form-item>
 
       </el-form>
@@ -74,6 +74,8 @@
 </template>
 
 <script>
+
+import * as RoleApi from '@/api/role'
 
 export default {
   name: 'Role',
@@ -94,7 +96,8 @@ export default {
         ],
         currentPage: 1,
         pageSize: 10,
-        total: 40
+        total: 40,
+        allData: []
 
       },
 
@@ -112,7 +115,35 @@ export default {
 
     }
   },
+  mounted() {
+    this.getRoleList()
+  },
   methods: {
+    /**
+     * 新增/编辑角色(后端请求)
+     */
+    addOrUpdateRole() {
+      this.$refs.roleEditForm.validate(valid => {
+        if (valid) {
+          const tempApi = this.roleEditForm.id ? RoleApi.updateRole : RoleApi.addRole
+          tempApi(this.roleEditForm).then(res => {
+            this.$message.success('操作成功')
+            this.getRoleList()
+            this.roleEditDialogVisible = false
+          })
+        }
+      })
+    },
+    /**
+     * 获取角色列表
+     */
+    getRoleList() {
+      RoleApi.getRoles(this.tableData.searchContent).then(res => {
+        this.tableData.allData = res.data.data
+        this.tableData.total = res.data.data.length
+        this.startPagination()
+      })
+    },
     /**
      * 新增角色
      */
@@ -138,6 +169,34 @@ export default {
         this.roleEditForm[key] = row[key]
       }
       this.openRoleEditDialog()
+    },
+
+    /**
+     * 前端分页
+     */
+    startPagination() {
+      // 角色数量较少，所以采用前端分页
+      const start = (this.tableData.currentPage - 1) * this.tableData.pageSize
+      const end = this.tableData.currentPage * this.tableData.pageSize
+      this.tableData.list = this.tableData.allData.slice(start, end)
+    },
+    /**
+     * 删除角色
+     * @param {Number} id
+     */
+    handleDelete(id) {
+      this.$confirm('此操作将永久删除该角色, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        RoleApi.deleteRoles([id]).then(() => {
+          this.$message.success('删除成功')
+          this.getRoleList()
+        })
+      }).catch(() => {
+        this.$message.info('已取消删除')
+      })
     }
 
   }

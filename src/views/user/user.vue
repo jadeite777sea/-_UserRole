@@ -71,7 +71,7 @@
         status-icon
         :model="userEditForm"
         label-width="80px"
-        rules="userEditForm.id ? userUpdateRules : userCreateRules"
+        :rules="userEditForm.id ? userUpdateRules : userCreateRules"
       >
         <el-form-item label="用户名" prop="userName">
           <el-input v-model="userEditForm.userName" />
@@ -168,7 +168,12 @@
 <script>
 
 import avatarUploadData from 'mockjs'
+import { getRoles } from '@/api/role'
+import LoadingUtils from '@/utils/loading-utils'
+import * as UserApi from '@/api/user'
+import md5 from 'js-md5'
 
+const copyObject = obj => JSON.parse(JSON.stringify(obj))
 export default {
   name: 'User',
   data() {
@@ -265,17 +270,58 @@ export default {
   computed: {
 
   },
+  mounted() {
+    this.getUserList()
+    this.getAllRoles()
+  },
 
   methods: {
+    /**
+     * 创建用户
+     */
+    handleCreateUser() {
+      this.resetUserEditForm()
+      this.openUserEditForm()
+    },
+
+    /**
+     * 重置查询条件
+     */
+    resetQuery() {
+      this.tableData.userName = ''
+      this.tableData.minCreateTime = ''
+      this.tableData.maxCreateTime = ''
+    },
+    /**
+     * 重置用户编辑表单
+     */
+    resetUserEditForm() {
+      for (const key in this.userEditForm) {
+        this.userEditForm[key] = ''
+      }
+      this.userEditForm.roleIds = []
+    },
+
+    /**
+     * 获取所有角色
+     */
+    getAllRoles() {
+      getRoles().then(res => {
+        this.allRoles = res.data.data
+        // this.$refs.userImportDialog.setRoles(this.allRoles)
+      })
+    },
     userNameValidator(rule, value, callback) {
       if (!value) {
         callback(new Error('请输入用户名'))
       } else if (this.userEditForm.id && value === this.currentEditRow.userName) {
         callback()
       } else {
-        checkUserName(value).then(res => {
-          callback(res.data.data ? new Error('用户名已存在') : undefined)
-        })
+        callback()
+        // 使用接口判断用户名是否为空
+        // checkUserName(value).then(res => {
+        //   callback(res.data.data ? new Error('用户名已存在') : undefined)
+        // })
       }
     },
 
@@ -298,35 +344,67 @@ export default {
     },
     avatarUploadData,
     getUserList() {
-      // 获取用户列表的方法，通常会调用API来获取用户数据
+      UserApi.getUsers(this.tableData).then(res => {
+        this.tableData.list = res.data.data.content
+        this.tableData.total = res.data.data.totalElements
+        // 更新头像
+        // this.$nextTick(() => {
+        //   this.tableData.list.forEach(row => {
+        //     this.getAvatar(row.id, row)
+        //   })
+        // })
+      })
     },
-
-    handleCreateUser() {
-      // 处理创建用户的操作，通常是打开一个对话框让用户输入信息
-      this.userEditDialogVisible = true
-    },
-
-    // 切换用户性别
-    handleSwitch() {
-      // 处理用户性别切换的逻辑
+    /**
+     * 切换用户状态
+     * @param {object} row 行数据
+     */
+    handleSwitch(row) {
+      UserApi.changeUserStatus(row.id, row.status).then(() => {
+        this.$message.success('操作成功')
+      })
     },
 
     // 编辑
     handleEdit(row) {
+      this.currentEditRow = row
       for (const key in this.userEditForm) {
         this.userEditForm[key] = row[key]
-        this.userEditDialogVisible = true
       }
+      this.userEditForm.roleIds = row.roleList
+        ? row.roleList.map(item => {
+          const role = this.allRoles.find(role => role.name === item)
+          return role && role.id
+        })
+        : []
+      this.userEditForm.roleIds.filter(id => id)
+      this.openUserEditForm()
+
+      // this.userEditDialogVisible = true
+    },
+    /**
+     * 打开用户编辑窗口
+     */
+    openUserEditForm() {
+      this.userEditDialogVisible = true
+      this.$nextTick(() => {
+        this.$refs.userEditForm.clearValidate()
+      })
     },
 
     handleDelete(userIds) {
-      // 处理删除用户的操作，参数row通常是用户的数据对象
-      this.$confirm('此操作将永久删除该用户，是否继续？', '提示', {
+      this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        // 对接删除用户接口
+        LoadingUtils.createFullScreenLoading('正在删除...')
+        UserApi.deleteUsers(userIds).then(() => {
+          this.$message.success('删除成功')
+          this.getUserList()
+        }).finally(() => {
+          LoadingUtils.closeFullScreenLoading()
+        })
       })
     },
     handleBatchDelete() {
@@ -362,15 +440,8 @@ export default {
       })
     },
 
-    resetQuery() {
-      // 重置查询条件，通常用于重置表单或查询参数
-    },
-
     handleSortChange() {
       // 处理排序改变的操作，通常用于表格排序的响应
-    },
-    addOrUpdateUser() {
-
     },
     handleImportUser() {
       this.importDialogVisible = true
@@ -386,6 +457,35 @@ export default {
     },
     importSelectedUsers() {
       // 处理导入已选择用户的逻辑
+    },
+    /**
+     * 添加或更新用户
+     */
+    addOrUpdateUser() {
+      this.$refs.userEditForm.validate(valid => {
+        if (valid) {
+          const params = copyObject(this.userEditForm)
+          if (!params.password) {
+            delete params.password
+          } else {
+            params.password = md5(params.password)
+          }
+          LoadingUtils.createFullScreenLoading('正在保存...')
+          const tempApi = this.userEditForm.id ? UserApi.updateUser : UserApi.addUser
+          tempApi(params).then(res => {
+            this.$message.success('操作成功')
+            if (!this.userEditForm.id) {
+              this.userEditForm.id = res.data.data.id
+            }
+            // 这是用来更新头像
+            // this.updateAvatar()
+            this.getUserList()
+          }).finally(() => {
+            this.userEditDialogVisible = false
+            LoadingUtils.closeFullScreenLoading()
+          })
+        }
+      })
     }
 
   }

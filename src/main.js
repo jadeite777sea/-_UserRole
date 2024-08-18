@@ -20,6 +20,8 @@ import './utils/error-log' // error log
 
 import * as filters from './filters' // global filters
 
+import axios from './utils/request'
+
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api
@@ -45,6 +47,7 @@ Object.keys(filters).forEach(key => {
 
 Vue.config.productionTip = false
 
+Vue.config.$http = axios
 new Vue({
   el: '#app',
   router,

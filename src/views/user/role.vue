@@ -11,7 +11,7 @@
       </el-form-item>
 
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="getUserList">搜索</el-button>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="getRoleList">搜索</el-button>
         <el-button icon="el-icon-plus" size="mini" @click="handleCreateRole">新增</el-button>
       </el-form-item>
     </el-form>
@@ -36,8 +36,8 @@
       :page-size.sync="tableData.pageSize"
       layout="total, sizes, prev, pager, next, jumper"
       :total="tableData.total"
-      @size-change="getUserList"
-      @current-change="getUserList"
+      @size-change="getRoleList"
+      @current-change="getRoleList"
     />
 
     <el-dialog
@@ -119,6 +119,9 @@ export default {
     this.getRoleList()
   },
   methods: {
+    handleSortChange() {
+      // 处理排序改变的操作，通常用于表格排序的响应
+    },
     /**
      * 新增/编辑角色(后端请求)
      */

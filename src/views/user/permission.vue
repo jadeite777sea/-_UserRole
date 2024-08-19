@@ -167,9 +167,6 @@ export default {
     /**
      * 获取角色列表
      */
-    /**
-     * 获取角色列表
-     */
     getRoles() {
       this.roleForm.loading = true
       RoleApi.getRoles(this.roleForm.searchName).then((res) => {

@@ -114,19 +114,6 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="头像">
-          <el-upload
-            class="avatar-uploader"
-            action=""
-            :auto-upload="false"
-            :show-file-list="false"
-            @change="file => handleAvatarChange(file)"
-          >
-            <!--            <img v-if="avatarUploadData.url" :src="avatarUploadData.url" class="avatar">&lt;!&ndash; 需要把变量声明完成&ndash;&gt;-->
-            <!--            <i v-else class="el-icon-plus avatar-uploader-icon" />-->
-          </el-upload>
-        </el-form-item>
-
         <el-form-item>
           <el-button @click="userEditDialogVisible = false">取 消</el-button>
           <el-button type="primary" @click="addOrUpdateUser">确 定</el-button>
@@ -167,7 +154,6 @@
 
 <script>
 
-import avatarUploadData from 'mockjs'
 import { getRoles } from '@/api/role'
 import LoadingUtils from '@/utils/loading-utils'
 import * as UserApi from '@/api/user'
@@ -342,7 +328,6 @@ export default {
         callback()
       }
     },
-    avatarUploadData,
     getUserList() {
       UserApi.getUsers(this.tableData).then(res => {
         this.tableData.list = res.data.data.content

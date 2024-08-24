@@ -2,9 +2,13 @@ package com.example.managebackend.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
+import com.example.managebackend.constant.PermissionCode;
 import com.example.managebackend.entity.User;
 import com.example.managebackend.service.UserRoleService;
 import com.example.managebackend.service.UserService;
+import com.example.managebackend.utils.FileUtils;
+import com.example.managebackend.utils.ServletUtils;
+import com.example.managebackend.utils.UserUtils;
 import com.example.managebackend.vo.ResponseVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -22,7 +26,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
+import com.example.managebackend.utils.DataUtils;
 @RestController
 @Api(tags = "user-api")
 @RequestMapping("/users")
@@ -46,7 +50,7 @@ public class UserController {
     @PostMapping("/check-password")
     public ResponseVO<Boolean> checkPassword(@RequestParam @ApiParam(value = "密码", required = true) String password) {
         Long userId = ServletUtils.getUserId();
-        User user = userService.getOne(new QueryWrapper<User>().eq("id", userId).eq("password", password).ne("status", User.Status.DELETED));
+        User user = userService.getOne(new QueryWrapper<User>().eq("id", userId).eq("password", password).ne("status", 0));
         return ResponseVO.success(user != null);
     }
 
@@ -61,7 +65,7 @@ public class UserController {
     public ResponseVO<String> updatePassword(@RequestParam @ApiParam(value = "旧密码", required = true) String oldPassword,
                                              @RequestParam @ApiParam(value = "新密码", required = true) String newPassword) {
         Long userId = ServletUtils.getUserId();
-        User user = userService.getOne(new QueryWrapper<User>().eq("id", userId).eq("password", oldPassword).ne("status", User.Status.DELETED));
+        User user = userService.getOne(new QueryWrapper<User>().eq("id", userId).eq("password", oldPassword).ne("status", 0));
         if (user == null) {
             return ResponseVO.error();
         }

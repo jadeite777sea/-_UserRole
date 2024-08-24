@@ -52,6 +52,9 @@ public class User implements Serializable {
     private Date createTime;
     // 更新时间
     private Date updateTime;
+    //角色ID列表
+    @TableField(exist = false)
+    private List<Integer> roleIds;
 
     // 非数据库字段
     @TableField(exist = false)
@@ -60,8 +63,25 @@ public class User implements Serializable {
     @TableField(exist = false)
     private List<String> permissionList;
 
+    public String generateAvatarName(String suffix) {
+        if (!Arrays.asList(".jpg", ".jpeg", ".png", ".gif").contains(suffix)) {
+            suffix = ".jpg";
+        }
+        return id + "_" + userName + suffix;
+    }
+    // 无参构造函数
+    public User() {
+    }
+
+    public User(String userName, String password, List<Integer> roleIds) {
+        this.userName = userName;
+        this.password = password;
+        this.roleIds = roleIds;
+    }
+
     // 排序字段
     public static final String ORDER_FIELDS = "create_time,user_name,true_name,email,gender,address,introduction,phone,status,update_time";
     public static final List<String> ORDER_FIELD_LIST = Arrays.asList(ORDER_FIELDS.split(","));
+
 
 }

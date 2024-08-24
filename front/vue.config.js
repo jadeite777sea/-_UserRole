@@ -17,7 +17,7 @@ const port = process.env.port || process.env.npm_config_port || 9527 // dev port
 
 const gatewayUrl = 'http://localhost:8002/api'
 const devUrlMap = {
-  'user-api': 'http://localhost:8080/v1'
+  'user-api': 'http://localhost:12345'
 }
 
 const prodUrlMap = {

@@ -11,13 +11,13 @@ import java.util.Map;
 
 public interface UserService extends IService<User> {
 
-//    List<Map<String, Object>> getUserRoleAndPermissionsByUserId(List<Long> userIds);
-//
-//    Page<User> getUserList(String userName, String minCreateTime, String maxCreateTime, String orderBy, String orderMethod, Integer page, Integer pageSize);
-//
-//    User addOneUser(User user) throws RuntimeException;
-//
-//    Map<String, Object> batchCreateUser(List<User> userDTOS);
+    List<Map<String, Object>> getUserRoleAndPermissionsByUserId(List<Long> userIds);
+
+    Page<User> getUserList(String userName, String minCreateTime, String maxCreateTime, String orderBy, String orderMethod, Integer page, Integer pageSize);
+
+    User addOneUser(User user) throws RuntimeException;
+
+    Map<String, Object> batchCreateUser(List<User> userDTOS);
 
     boolean existsByUserName(String userName, Boolean throwExceptionWhenExists) throws RuntimeException;
 

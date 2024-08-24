@@ -3,8 +3,12 @@ package com.example.managebackend.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
 import com.example.managebackend.entity.User;
+import com.example.managebackend.enums.PlatformEnum;
+import com.example.managebackend.enums.RoleEnum;
 import com.example.managebackend.service.RoleService;
 import com.example.managebackend.service.UserService;
+import com.example.managebackend.utils.ServletUtils;
+import com.example.managebackend.utils.UserUtils;
 import com.example.managebackend.vo.ResponseVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -46,6 +50,7 @@ public class AuthController {
     public ResponseVO<Map<String, Object>> login(@RequestParam @ApiParam(value = "用户名", required = true) String userName,
                                                  @RequestParam @ApiParam(value = "密码", required = true) String password,
                                                  @RequestParam @ApiParam(value = "登录系统, " + PlatformEnum.PLATFORM_DESC, required = true) Integer platform) {
+        System.out.println("登录路径");
         User user = userService.getOne(new QueryWrapper<User>().eq("user_name", userName));
         if (user == null) {
             return ResponseVO.error();
@@ -94,7 +99,7 @@ public class AuthController {
             return ResponseVO.error();
         }
         try {
-            userService.addOneUser(new UserDTO(userName, password, Collections.singletonList(role.getId())));
+            userService.addOneUser(new User(userName, password, Collections.singletonList(role.getId())));
         } catch (RuntimeException e) {
             return ResponseVO.error();
         }

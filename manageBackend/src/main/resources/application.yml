@@ -15,3 +15,5 @@ spring:
         username: root
         password: Zy737801@
 
+id-generator:
+    worker-id: 1

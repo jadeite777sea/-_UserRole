@@ -2,7 +2,7 @@
   <div class="dashboard-container">
     <el-form ref="form" :model="tableData" label-width="80px" :inline="true" size="small">
       <el-form-item label="用户名称">
-        <el-input v-model="tableData.usernName" aria-placeholder="请输入用户名称" />
+        <el-input v-model="tableData.userName" aria-placeholder="请输入用户名称" />
       </el-form-item>
 
       <el-form-item label="创建时间">
@@ -166,20 +166,10 @@ export default {
     return {
 
       tableData: {
-        usernName: '',
+        userName: '',
         maxCreatetime: '',
         minCreatetime: '',
-        list: [
-          {
-            id: 1,
-            userName: '张三',
-            trueName: '张三',
-            roleList: [],
-            createTime: '',
-            status: true
-
-          }
-        ],
+        list: [],
         selection: '',
         pageNum: 1,
         pageSize: 10,
@@ -393,40 +383,19 @@ export default {
       })
     },
     handleBatchDelete() {
-      // 处理批量删除用户的操作
-      // 获取选中的用户ID数组
-      // 如果没有选中任何用户，提示用户选择
-      if (this.tableData.selection === '') {
-        this.$message({
-          type: 'warning',
-          message: '请选择要删除的用户'
-        })
+      if (this.tableData.selection.length === 0) {
+        this.$message.warning('请选择要删除的用户')
         return
       }
       const userIds = this.tableData.selection.map(item => item.id)
-
-      // 调用单个删除方法进行批量删除
-      this.$confirm('此操作将永久删除选中的用户，是否继续？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        // 循环删除选中的用户
-        userIds.forEach(userId => {
-          this.handleDelete(userId)
-        })
-
-        // 在这里可以添加其他操作，例如刷新表格数据
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消删除'
-        })
-      })
+      this.handleDelete(userIds)
     },
 
-    handleSortChange() {
+    handleSortChange({ column, prop, order }) {
       // 处理排序改变的操作，通常用于表格排序的响应
+      this.tableData.orderBy = prop
+      this.tableData.orderMethod = order === 'ascending' ? 'asc' : 'desc'
+      this.getUserList()
     },
     handleImportUser() {
       this.importDialogVisible = true
@@ -456,6 +425,7 @@ export default {
             params.password = md5(params.password)
           }
           LoadingUtils.createFullScreenLoading('正在保存...')
+          console.log(params)
           const tempApi = this.userEditForm.id ? UserApi.updateUser : UserApi.addUser
           tempApi(params).then(res => {
             this.$message.success('操作成功')

@@ -61,7 +61,7 @@ public class UserController {
      * @param newPassword 新密码
      */
     @ApiOperation(value = "修改密码", notes = "根据原密码，新密码，进行更改密码操作")
-    @PutMapping("/me/password")
+    @PutMapping("/password")
     public ResponseVO<String> updatePassword(@RequestParam @ApiParam(value = "旧密码", required = true) String oldPassword,
                                              @RequestParam @ApiParam(value = "新密码", required = true) String newPassword) {
         Long userId = ServletUtils.getUserId();
@@ -137,8 +137,11 @@ public class UserController {
     @GetMapping("/me")
     public ResponseVO<User> getUserInfo() {
         User user = userService.getById(ServletUtils.getUserId());
+        System.out.println(user);
         List<Map<String, Object>> roleAndPermissionInfo = userService.getUserRoleAndPermissionsByUserId(Collections.singletonList(user.getId()));
+        System.out.println(roleAndPermissionInfo);
         UserUtils.setUserRoleAndPermissionInfo(user, roleAndPermissionInfo);
+        System.out.println(user);
         return ResponseVO.success(user);
     }
 
@@ -149,9 +152,9 @@ public class UserController {
      */
     @PostMapping
     @ApiOperation(value = "添加用户")
-    @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
+    //@PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
     public ResponseVO<User> addOneUser(@RequestBody User user) {
-
+        System.out.println(user);
         try {
             user = userService.addOneUser(user);
         } catch (RuntimeException e) {
@@ -173,7 +176,7 @@ public class UserController {
      */
     @ApiOperation(value = "获取用户列表")
     @GetMapping
-    @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
+    //@PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
     public ResponseVO<Page<User>> getUserList(
             @RequestParam(defaultValue = "") @ApiParam(value = "用户名") String userName,
             @RequestParam(required = false) @ApiParam(value = "最小创建时间") String minCreateTime,
@@ -194,6 +197,8 @@ public class UserController {
         } else {
             orderMethod = "desc".equalsIgnoreCase(orderMethod) ? "desc" : "asc";
         }
+        System.out.println("用户名信息"+userName);
+        System.out.println("页码"+pageNum);
         return ResponseVO.success(userService.getUserList(userName, minCreateTime, maxCreateTime, orderBy, orderMethod, pageNum, pageSize));
     }
 
@@ -205,7 +210,7 @@ public class UserController {
     @ApiOperation(value = "更新用户信息", notes = "根据用户id和用户信息进行更改用户信息操作")
     @PutMapping
     @Transactional(rollbackFor = Exception.class)
-    @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
+    //@PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
     public ResponseVO<String> updateUserInfo(@RequestBody User user) {
 
         if (user == null) {
@@ -229,7 +234,7 @@ public class UserController {
      */
     @ApiOperation(value = "更新用户头像")
     @PutMapping("/{id}/avatar")
-    @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
+    //@PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
     public ResponseVO<String> updateUserAvatar(@PathVariable long id,
                                                @RequestPart MultipartFile avatar) {
         User user = userService.getById(id);
@@ -250,7 +255,7 @@ public class UserController {
      */
     @ApiOperation(value = "获取用户头像")
     @GetMapping("/{id}/avatar")
-    @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
+    //@PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
     public void getUserAvatar(@PathVariable long id, HttpServletResponse response) {
         User user = userService.getById(id);
         String avatarPath =  user.getAvatarPath();
@@ -268,7 +273,7 @@ public class UserController {
     @ApiOperation(value = "删除用户")
     @DeleteMapping
     @Transactional(rollbackFor = Exception.class)
-    @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
+    //@PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
     public ResponseVO<String> deleteUsers(@RequestParam @ApiParam(value = "用户id列表") List<Long> ids) {
         if (ids == null || ids.isEmpty()) {
             return ResponseVO.error();
@@ -288,7 +293,7 @@ public class UserController {
     @ApiOperation(value = "批量创建用户")
     @PostMapping("/batch")
     @Transactional(rollbackFor = Exception.class)
-    @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
+    //@PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
     public ResponseVO<Map<String, Object>> batchCreateUser(@RequestBody List<User> userList) {
         Map<String, Object> resultMap = userService.batchCreateUser(userList);
         if (resultMap == null) {
@@ -309,7 +314,7 @@ public class UserController {
      */
     @ApiOperation(value = "修改用户状态")
     @PutMapping("/{id}/status")
-    @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
+    //@PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
     public ResponseVO<String> updateUserStatus(@PathVariable Long id,
                                                @RequestParam Integer status) {
         User user = userService.getById(id);
@@ -328,7 +333,7 @@ public class UserController {
      */
     @ApiOperation(value = "批量检查用户名是否存在")
     @PostMapping("/user-name/batch-check-existence")
-    @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
+    //@PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
     public ResponseVO<Map<String, Boolean>> checkUserNameExists(@RequestBody List<String> userNameList) {
         return ResponseVO.success(userService.batchCheckUserName(userNameList));
     }

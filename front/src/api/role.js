@@ -1,12 +1,4 @@
 import request from '@/utils/request'
-
-export function getRoutes() {
-  return request({
-    url: '/vue-element-admin/routes',
-    method: 'get'
-  })
-}
-
 /**
  * 获取角色列表
  * @param {string} searchContent
@@ -14,6 +6,24 @@ export function getRoutes() {
  */
 export function getRoles(searchContent) {
   return request.get('user-api/roles', { params: { searchContent }})
+}
+
+/**
+ * 检查角色名是否存在
+ * @param {string} roleName
+ */
+export function checkRoleName(roleName) {
+  const url = `user-api/roles/name/exists?name=${roleName}`
+  return request.get(url)
+}
+
+/**
+ * 删除角色
+ * @param {list} roleIds
+ */
+export function deleteRoles(roleIds) {
+  const url = 'user-api/roles?ids=' + roleIds.join(',')
+  return request.delete(url)
 }
 
 /**
@@ -33,12 +43,23 @@ export function updateRole(data) {
 }
 
 /**
- * 删除角色
- * @param {list} roleIds
+ * 获取角色的权限
+ * @param {number} roleId
  */
-export function deleteRoles(roleIds) {
-  const url = 'user-api/roles?ids=' + roleIds.join(',')
-  return request.delete(url)
+export function getPermissionOfRole(roleId) {
+  const url = 'user-api/roles/' + roleId + '/permissions'
+  return request.get(url)
+}
+
+/**
+ * 更新角色的权限
+ * @param {number} roleId
+ * @param {list} permissionIds
+ * @param {boolean} deleteOld
+ */
+export function updatePermissionOfRole(roleId, permissionIds, deleteOld = true) {
+  const url = 'user-api/roles/' + roleId + '/permissions'
+  return request.post(url + '?deleteOld=' + deleteOld + '&permissionIds=' + permissionIds.join(','))
 }
 
 /**
@@ -49,12 +70,4 @@ export function getAllPermissions() {
   return request.get(url)
 }
 
-/**
- * 获取角色的权限
- * @param {number} roleId
- */
-export function getPermissionOfRole(roleId) {
-  const url = 'user-api/roles/' + roleId + '/permissions'
-  return request.get(url)
-}
 

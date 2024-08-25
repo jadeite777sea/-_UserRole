@@ -25,12 +25,11 @@ public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.INPUT)
     private Long id;
     // 用户名
     private String userName;
     // 密码
-    @JsonIgnore
     private String password;
     // 头像路径
     private String avatarPath;

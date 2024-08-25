@@ -14,6 +14,7 @@ export function getInfo() {
  */
 export function getUsers(data) {
   const params = new URLSearchParams(data)
+  console.log(data)
   // orderBy 的驼峰转换为下划线
   if (params.has('orderBy')) {
     params.set('orderBy', params.get('orderBy').replace(/([A-Z])/g, '_$1').toLowerCase())
@@ -27,6 +28,7 @@ export function getUsers(data) {
  * @param {Object} data {userName, trueName, password, email, phone, gender, address, introduction, roleIds}
  */
 export function addUser(data) {
+  console.log(data)
   return request.post('user-api/users', data)
 }
 

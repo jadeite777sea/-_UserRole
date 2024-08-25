@@ -1,15 +1,62 @@
-INSERT INTO user (id, user_name, password, avatar_path, phone, email, gender, address, introduction, true_name, create_time, update_time, status)
-VALUES
-    (1, 'JohnDoe', 'password123', '/avatars/johndoe.png', '1234567890', 'johndoe@example.com', 1, '123 Main St', 'Hello, I am John.', 'John Doe', NOW(), NOW(), 1),
-    (2, 'JaneSmith', 'password123', '/avatars/janesmith.png', '0987654321', 'janesmith@example.com', 2, '456 Oak St', 'Hello, I am Jane.', 'Jane Smith', NOW(), NOW(), 1),
-    (3, 'AliceJohnson', 'password123', '/avatars/alicejohnson.png', '1122334455', 'alicejohnson@example.com', 2, '789 Pine St', 'Hello, I am Alice.', 'Alice Johnson', NOW(), NOW(), 1),
-    (4, 'BobBrown', 'password123', '/avatars/bobbrown.png', '6677889900', 'bobbrown@example.com', 1, '101 Maple St', 'Hello, I am Bob.', 'Bob Brown', NOW(), NOW(), 1);
 
 
-INSERT INTO user_role (id, user_id, role_id, create_time)
+INSERT INTO `user`(`id`, `user_name`, `password`, `status`) VALUES
+(4, 'user4', 'e10adc3949ba59abbe56e057f20f883e', 1),
+(5, 'user5', 'e10adc3949ba59abbe56e057f20f883e', 1),
+(6, 'user6', 'e10adc3949ba59abbe56e057f20f883e', 1),
+(7, 'user7', 'e10adc3949ba59abbe56e057f20f883e', 1),
+(8, 'user8', 'e10adc3949ba59abbe56e057f20f883e', 1),
+(9, 'user9', 'e10adc3949ba59abbe56e057f20f883e', 1),
+(10, 'user10', 'e10adc3949ba59abbe56e057f20f883e', 1),
+(11, 'user11', 'e10adc3949ba59abbe56e057f20f883e', 1),
+(12, 'user12', 'e10adc3949ba59abbe56e057f20f883e', 1),
+(13, 'user13', 'e10adc3949ba59abbe56e057f20f883e', 1),
+(14, 'user14', 'e10adc3949ba59abbe56e057f20f883e', 1),
+(15, 'user15', 'e10adc3949ba59abbe56e057f20f883e', 1),
+(16, 'user16', 'e10adc3949ba59abbe56e057f20f883e', 1),
+(17, 'user17', 'e10adc3949ba59abbe56e057f20f883e', 1),
+(18, 'user18', 'e10adc3949ba59abbe56e057f20f883e', 1),
+(19, 'user19', 'e10adc3949ba59abbe56e057f20f883e', 1),
+(20, 'user20', 'e10adc3949ba59abbe56e057f20f883e', 1),
+(21, 'user21', 'e10adc3949ba59abbe56e057f20f883e', 1),
+(22, 'user22', 'e10adc3949ba59abbe56e057f20f883e', 1),
+(23, 'user23', 'e10adc3949ba59abbe56e057f20f883e', 1),
+(24, 'user24', 'e10adc3949ba59abbe56e057f20f883e', 1),
+(25, 'user25', 'e10adc3949ba59abbe56e057f20f883e', 1),
+(26, 'user26', 'e10adc3949ba59abbe56e057f20f883e', 1),
+(27, 'user27', 'e10adc3949ba59abbe56e057f20f883e', 1),
+(28, 'user28', 'e10adc3949ba59abbe56e057f20f883e', 1),
+(29, 'user29', 'e10adc3949ba59abbe56e057f20f883e', 1),
+(30, 'user30', 'e10adc3949ba59abbe56e057f20f883e', 1);
+
+
+-- 为 user4 到 user30 设置角色为普通用户 (role_id = 2)
+INSERT INTO `user_role`(`user_id`, `role_id`, `create_time`)
 VALUES
-    (1, 1, 2, NOW()),  -- JohnDoe 拥有 role_id 为 2 的角色
-    (2, 2, 3, NOW()),  -- JaneSmith 拥有 role_id 为 3 的角色
-    (3, 3, 2, NOW()),  -- AliceJohnson 拥有 role_id 为 2 的角色
-    (4, 4, 3, NOW()),  -- BobBrown 拥有 role_id 为 3 的角色
-    (5, 4, 2, NOW());  -- BobBrown 也拥有 role_id 为 2 的角色
+    (4, 2, CURRENT_TIMESTAMP),
+    (5, 2, CURRENT_TIMESTAMP),
+    (6, 2, CURRENT_TIMESTAMP),
+    (7, 2, CURRENT_TIMESTAMP),
+    (8, 2, CURRENT_TIMESTAMP),
+    (9, 2, CURRENT_TIMESTAMP),
+    (10, 2, CURRENT_TIMESTAMP),
+    (11, 2, CURRENT_TIMESTAMP),
+    (12, 2, CURRENT_TIMESTAMP),
+    (13, 2, CURRENT_TIMESTAMP),
+    (14, 2, CURRENT_TIMESTAMP),
+    (15, 2, CURRENT_TIMESTAMP),
+    (16, 2, CURRENT_TIMESTAMP),
+    (17, 2, CURRENT_TIMESTAMP),
+    (18, 2, CURRENT_TIMESTAMP),
+    (19, 2, CURRENT_TIMESTAMP),
+    (20, 2, CURRENT_TIMESTAMP),
+    (21, 2, CURRENT_TIMESTAMP),
+    (22, 2, CURRENT_TIMESTAMP),
+    (23, 2, CURRENT_TIMESTAMP),
+    (24, 2, CURRENT_TIMESTAMP),
+    (25, 2, CURRENT_TIMESTAMP),
+    (26, 2, CURRENT_TIMESTAMP),
+    (27, 2, CURRENT_TIMESTAMP),
+    (28, 2, CURRENT_TIMESTAMP),
+    (29, 2, CURRENT_TIMESTAMP),
+    (30, 2, CURRENT_TIMESTAMP);

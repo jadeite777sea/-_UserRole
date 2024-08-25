@@ -40,6 +40,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public Page<User> getUserList(String userName, String minCreateTime, String maxCreateTime, String orderBy, String orderMethod, Integer page, Integer pageSize) {
+        System.out.println("用户名： "+userName);
         List<User> userList = userMapper.getUserList(userName, minCreateTime, maxCreateTime, orderBy, orderMethod, (page - 1) * pageSize, pageSize);
         List<Map<String, Object>> list = userMapper.getUserRoleAndPermissionsByUserId(userList.stream().map(User::getId).collect(Collectors.toList()));
         Map<Long, Map<String, Object>> map = list.stream().collect(Collectors.toMap(m -> (Long) m.get("userId"), m -> m));
@@ -62,7 +63,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         Date date = new Date();
         user.setId(IdGenerator.nextId());
         user.setStatus(1).setCreateTime(date).setUpdateTime(date);
-        userMapper.insert(user);
+
+        System.out.println(user);
+        try {
+            int result = userMapper.insert(user);
+            if (result > 0) {
+                System.out.println("Insert successful!s");
+            } else {
+                System.out.println("Insert failed, no rows affected.");
+            }
+        } catch (Exception e) {
+            // 捕获并输出异常信息
+            System.err.println("An error occurred while trying to insert the user:");
+            e.printStackTrace();  // 输出异常堆栈信息
+        }
+
+
         userRoleService.addUserRole(user.getId(), user.getRoleIds(), false);
         return user;
     }

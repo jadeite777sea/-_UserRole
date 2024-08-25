@@ -48,12 +48,24 @@ public interface UserMapper extends BaseMapper<User> {
             "ORDER BY ${orderBy} ${orderMethod} " +
             "LIMIT #{start}, #{length}" +
             "</script>")
-    List<User> getUserList(String userName, String minCreateTime, String maxCreateTime, String orderBy, String orderMethod, Integer start, Integer length);
-
+    List<User> getUserList(
+            @Param("userName") String userName,
+            @Param("minCreateTime") String minCreateTime,
+            @Param("maxCreateTime") String maxCreateTime,
+            @Param("orderBy") String orderBy,
+            @Param("orderMethod") String orderMethod,
+            @Param("start") Integer start,
+            @Param("length") Integer length
+    );
     @Select("<script>" +
             "SELECT COUNT(*) FROM `user` u " +
             "<where>" + userSearchWhereSql + "</where>" +
             "</script>")
-    int countUserList(String userName, String minCreateTime, String maxCreateTime);
+    int countUserList(
+            @Param("userName") String userName,
+            @Param("minCreateTime") String minCreateTime,
+            @Param("maxCreateTime") String maxCreateTime
+    );
+
 
 }

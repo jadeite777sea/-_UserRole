@@ -14,6 +14,7 @@ import com.example.managebackend.service.LoginLogService;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class UserUtils {
@@ -64,6 +65,11 @@ public class UserUtils {
     public static void setUserRoleAndPermissionInfo(User user, List<Map<String, Object>> roleAndPermissionInfo) {
         if (roleAndPermissionInfo != null && roleAndPermissionInfo.size() > 0) {
             Map<String, Object> tempInfo = roleAndPermissionInfo.get(0);
+            user.setRoleIds(
+                    Arrays.stream(((String) tempInfo.get("roleIdList")).split(","))  // 拆分字符串
+                            .map(Integer::parseInt)  // 将每个字符串转换为整数
+                            .collect(Collectors.toList())  // 收集结果为List<Integer>
+            );
             user.setRoleList(Arrays.asList(((String) tempInfo.get("roleNameList")).split(",")));
             user.setPermissionList(Arrays.asList(((String) tempInfo.get("permissionCodeList")).split(",")));
         }
@@ -109,6 +115,7 @@ public class UserUtils {
             return ResponseVO.error();
         }
         if (user.getStatus() != 1) {
+            System.out.println("用户可能已经删除");
             return ResponseVO.error();
         }
         System.out.println(password);

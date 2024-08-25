@@ -50,8 +50,8 @@ public class AuthController {
     public ResponseVO<Map<String, Object>> login(@RequestParam @ApiParam(value = "用户名", required = true) String userName,
                                                  @RequestParam @ApiParam(value = "密码", required = true) String password,
                                                  @RequestParam @ApiParam(value = "登录系统, " + PlatformEnum.PLATFORM_DESC, required = true) Integer platform) {
-        System.out.println("登录路径");
-        User user = userService.getOne(new QueryWrapper<User>().eq("user_name", userName));
+
+        User user = userService.getOne(new QueryWrapper<User>().eq("user_name", userName).ne("status", 0));
         if (user == null) {
             return ResponseVO.error();
         }

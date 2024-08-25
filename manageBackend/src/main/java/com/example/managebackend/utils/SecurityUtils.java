@@ -53,6 +53,9 @@ public class SecurityUtils {
         } else {
             http.authorizeRequests().anyRequest().permitAll();
         }
+
+        // 添加过滤器
+        http.addFilterBefore(new LoginFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
     private static class LoginFilter extends OncePerRequestFilter {

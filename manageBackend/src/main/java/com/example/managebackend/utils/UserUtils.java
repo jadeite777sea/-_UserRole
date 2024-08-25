@@ -128,15 +128,33 @@ public class UserUtils {
         setUserRoleAndPermissionInfo(user, roleAndPermissionInfo);
         String roleNameList = String.join(",", user.getRoleList());
         String permissionCodeList = String.join(",", user.getPermissionList());
+        System.out.println(user);
         if (!checkUserHasPermissionForPlatform(roleAndPermissionInfo, platformId)) {
+
             return ResponseVO.error();
         }
+
+        // 获取客户端IP地址
         String ip = ServletUtils.getRequest().getHeader("X-Real-IP");
+        if (ip == null) {
+            throw new IllegalArgumentException("IP地址获取失败");
+        }
+        System.out.println("11111111111111");
+        // 保存登录日志
         instance.loginLogService.save(new LoginLog(user.getId(), ip, new Date(), platformId));
+        System.out.println("11111111111111");
+        // 创建返回的数据
         Map<String, Object> returnMap = new HashMap<>();
         returnMap.put("user", user);
+        System.out.println("11111111111111");
+        // 设置Token数据
         ServletUtils.setTokenData(user.getId(), user.getUserName(), roleNameList, permissionCodeList);
+        System.out.println("11111111111111");
         return ResponseVO.success(returnMap);
+
+
+
+
     }
 
     private static final String USER_NAME_PATTERN = "^[a-zA-Z0-9._-]+$";

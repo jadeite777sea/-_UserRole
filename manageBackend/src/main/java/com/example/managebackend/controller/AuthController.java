@@ -52,11 +52,16 @@ public class AuthController {
                                                  @RequestParam @ApiParam(value = "登录系统, " + PlatformEnum.PLATFORM_DESC, required = true) Integer platform) {
 
         User user = userService.getOne(new QueryWrapper<User>().eq("user_name", userName).ne("status", 0));
+        System.out.println(user);
         if (user == null) {
             return ResponseVO.error();
         }
-        return UserUtils.handleUserLogin(user, password, platform);
+        System.out.println("平台 "+ platform);
+
+        // 使用 UserUtils.handleUserLogin 方法处理登录逻辑，并传入生成的 platform 参数
+        return UserUtils.handleUserLogin(user, password,platform);
     }
+
 
     /**
      * 退出登录

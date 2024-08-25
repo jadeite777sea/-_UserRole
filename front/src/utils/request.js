@@ -14,6 +14,9 @@ service.interceptors.request.use(
     if (token) {
       config.headers.Authorization = token // 如果存在 token，则在请求头中添加 Authorization
     }
+
+    config.headers['X-Real-IP'] = '0.0.0.0' // 如果无法获取 IP，设置为默认值
+
     return config
   },
   err => {

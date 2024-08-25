@@ -57,6 +57,14 @@ public class ResponseVO<T> {
         return new ResponseVO<>(200,"Success", data);
     }
 
+    /**
+     * 构建失败返回对象，带有自定义错误消息
+     */
+    public static <T> ResponseVO<T> error(String message) {
+        return new ResponseVO<>(400, message, null);
+    }
+
+
 
 
 

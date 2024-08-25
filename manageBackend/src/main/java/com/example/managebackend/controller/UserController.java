@@ -13,9 +13,12 @@ import com.example.managebackend.vo.ResponseVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -137,7 +140,7 @@ public class UserController {
     @GetMapping("/me")
     public ResponseVO<User> getUserInfo() {
         User user = userService.getById(ServletUtils.getUserId());
-        System.out.println(user);
+        System.out.println("/me "+user);
         List<Map<String, Object>> roleAndPermissionInfo = userService.getUserRoleAndPermissionsByUserId(Collections.singletonList(user.getId()));
         System.out.println(roleAndPermissionInfo);
         UserUtils.setUserRoleAndPermissionInfo(user, roleAndPermissionInfo);
@@ -152,7 +155,7 @@ public class UserController {
      */
     @PostMapping
     @ApiOperation(value = "添加用户")
-    //@PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
+    @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
     public ResponseVO<User> addOneUser(@RequestBody User user) {
         System.out.println(user);
         try {
@@ -176,7 +179,7 @@ public class UserController {
      */
     @ApiOperation(value = "获取用户列表")
     @GetMapping
-    //@PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
+    @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
     public ResponseVO<Page<User>> getUserList(
             @RequestParam(defaultValue = "") @ApiParam(value = "用户名") String userName,
             @RequestParam(required = false) @ApiParam(value = "最小创建时间") String minCreateTime,
@@ -185,6 +188,9 @@ public class UserController {
             @RequestParam(required = false) @ApiParam(value = "排序方式: " + DataUtils.ORDER_METHODS) String orderMethod,
             @RequestParam @ApiParam(value = "页码", required = true) int pageNum,
             @RequestParam @ApiParam(value = "每页数量", required = true) int pageSize) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("当前用户权限: " + authentication.getAuthorities());
+
         if (DataUtils.isTimeFormatInvalid(minCreateTime)) {
             minCreateTime = null;
         }
@@ -210,7 +216,7 @@ public class UserController {
     @ApiOperation(value = "更新用户信息", notes = "根据用户id和用户信息进行更改用户信息操作")
     @PutMapping
     @Transactional(rollbackFor = Exception.class)
-    //@PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
+    @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
     public ResponseVO<String> updateUserInfo(@RequestBody User user) {
 
         if (user == null) {
@@ -234,7 +240,7 @@ public class UserController {
      */
     @ApiOperation(value = "更新用户头像")
     @PutMapping("/{id}/avatar")
-    //@PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
+    @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
     public ResponseVO<String> updateUserAvatar(@PathVariable long id,
                                                @RequestPart MultipartFile avatar) {
         User user = userService.getById(id);
@@ -255,7 +261,7 @@ public class UserController {
      */
     @ApiOperation(value = "获取用户头像")
     @GetMapping("/{id}/avatar")
-    //@PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
+    @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
     public void getUserAvatar(@PathVariable long id, HttpServletResponse response) {
         User user = userService.getById(id);
         String avatarPath =  user.getAvatarPath();
@@ -273,7 +279,7 @@ public class UserController {
     @ApiOperation(value = "删除用户")
     @DeleteMapping
     @Transactional(rollbackFor = Exception.class)
-    //@PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
+    @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
     public ResponseVO<String> deleteUsers(@RequestParam @ApiParam(value = "用户id列表") List<Long> ids) {
         if (ids == null || ids.isEmpty()) {
             return ResponseVO.error();
@@ -293,7 +299,7 @@ public class UserController {
     @ApiOperation(value = "批量创建用户")
     @PostMapping("/batch")
     @Transactional(rollbackFor = Exception.class)
-    //@PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
+    @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
     public ResponseVO<Map<String, Object>> batchCreateUser(@RequestBody List<User> userList) {
         Map<String, Object> resultMap = userService.batchCreateUser(userList);
         if (resultMap == null) {
@@ -314,7 +320,7 @@ public class UserController {
      */
     @ApiOperation(value = "修改用户状态")
     @PutMapping("/{id}/status")
-    //@PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
+    @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
     public ResponseVO<String> updateUserStatus(@PathVariable Long id,
                                                @RequestParam Integer status) {
         User user = userService.getById(id);
@@ -333,7 +339,7 @@ public class UserController {
      */
     @ApiOperation(value = "批量检查用户名是否存在")
     @PostMapping("/user-name/batch-check-existence")
-    //@PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
+    @PreAuthorize("hasAuthority('" + PermissionCode.USER_MANAGE + "')")
     public ResponseVO<Map<String, Boolean>> checkUserNameExists(@RequestBody List<String> userNameList) {
         return ResponseVO.success(userService.batchCheckUserName(userNameList));
     }

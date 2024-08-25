@@ -10,8 +10,9 @@ export function login(data) {
   params.append('userName', data.userName)
   // 这里使用md5加密密码。md5已被证明是不安全的，实际开发中应使用更安全的加密方式
   params.append('password', md5(data.password))
-  // params.append('password', data.password)
-  params.append('platform', 2)
+
+  params.append('platform', data.platform)
+  // params.append('platform', 2)
   console.log(params.toString())
   return request.post('user-api/auth/login', params)
 }

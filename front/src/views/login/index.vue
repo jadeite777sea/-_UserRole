@@ -45,6 +45,13 @@
         </el-form-item>
       </el-tooltip>
 
+      <el-form-item label="选择平台" prop="platform" :rules="[{ required: true, message: '请选择平台', trigger: 'change' }]">
+        <el-radio-group v-model="loginForm.platform">
+          <el-radio :label="1">展示平台</el-radio>
+          <el-radio :label="2">管理平台</el-radio>
+        </el-radio-group>
+      </el-form-item>
+
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登 录</el-button>
 
     </el-form>
@@ -68,7 +75,8 @@ export default {
       title: defaultSettings.title,
       loginForm: {
         userName: '',
-        password: ''
+        password: '',
+        platform: ''
       },
       loginRules: {
         userName: [{ required: true, trigger: 'blur', message: '用户名不能为空' }],

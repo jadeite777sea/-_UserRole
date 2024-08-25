@@ -5,7 +5,7 @@ DELETE FROM `role`;
 INSERT INTO `role`(`id`, `name`, `description`, `status`)
 VALUES (1, '超级管理员', '拥有所有权限', 1),
        (2, '普通用户', '拥有部分权限', 1),
-       (3, '管理员', '拥有管理权限', 1);
+       (3, '管理员', '拥有部分管理权限', 1);
 
 -- permission
 DELETE FROM `permission`;
@@ -15,8 +15,10 @@ VALUES (1, '展示平台', 'DISPLAY', '展示平台权限', 1, NULL),
        (2, '管理平台', 'MANAGE', '管理平台权限', 2, NULL),
        (101, '展示平台浏览权限', 'DISPLAY:BROWSE', '展示平台浏览权限', 1, 1),
        (102, '展示平台个人中心权限', 'DISPLAY:EDIT', '展示平台个人中心权限', 1, 1),
-       (201, '数据管理权限', 'MANAGE:DATA', '数据管理权限', 2, 2),
-       (202, '用户管理权限', 'MANAGE:USER', '用户管理权限', 2, 2);
+       (201, '部分数据管理权限', 'MANAGE:DATA', '部分数据管理权限', 2, 2),
+       (202, '部分用户管理权限', 'MANAGE:USER', '部分用户管理权限', 2, 2),
+       (203, '全部数据管理权限', 'MANAGE:DATA_ALL', '全部数据管理权限', 2, 2),
+       (204, '全部用户管理权限', 'MANAGE:USER_ALL', '全部用户管理权限', 2, 2);
 
 
 -- role_permission
